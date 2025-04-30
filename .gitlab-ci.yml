@@ -1,0 +1,44 @@
+stages:
+  - build
+  - test
+  - sonar
+  - docker
+
+variables:
+  SONAR_SCANNER_OPTS: "-Xmx512m"
+  DOCKER_DRIVER: overlay2
+
+services:
+  - docker:dind
+
+before_script:
+  - echo "Running CI"
+
+build:
+  stage: build
+  image: maven:3.8.5-openjdk-11
+  script:
+    - mvn clean compile
+
+test:
+  stage: test
+  image: maven:3.8.5-openjdk-11
+  script:
+    - mvn test
+
+sonar:
+  stage: sonar
+  image: sonarsource/sonar-scanner-cli:latest
+  script:
+    - sonar-scanner
+  only:
+    - main
+
+docker:
+  stage: docker
+  image: docker:latest
+  script:
+    - docker-compose build
+    - docker-compose up -d
+  only:
+    - main
