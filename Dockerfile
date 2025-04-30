@@ -2,13 +2,13 @@
 # Build stage
 FROM maven:3.8.5-openjdk-11 AS build
 WORKDIR /app
-COPY . .
+COPY . .  # Ensure mysql-connector.zip is in the same directory as this Dockerfile
 
-# Unzip the mysql-connector.jar
+# Unzip the mysql-connector.zip to /app/lib
 RUN apt-get update && apt-get install -y unzip && \
     unzip mysql-connector.zip -d /app/lib
 
-# Build the app
+# Build the application
 RUN mvn clean package -DskipTests
 
 # Final image: use Tomcat to run the WAR
@@ -32,7 +32,7 @@ EXPOSE 8080
 FROM openjdk:11-jre-slim
 WORKDIR /app
 
-# Copy the war and the MySQL connector jar
+# Copy the war file and MySQL connector jar
 COPY --from=build /app/target/student.war app.jar
 COPY --from=build /app/lib/mysql-connector.jar /app/lib/mysql-connector.jar
 
@@ -42,7 +42,7 @@ USER appuser
 
 EXPOSE 8080
 
-# Run the jar file
+# Run the jar file with MySQL connector
 CMD ["java", "-cp", "app.jar:/app/lib/mysql-connector.jar", "com.studentapp.StudentApp"]
 
 
