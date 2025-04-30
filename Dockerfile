@@ -43,6 +43,6 @@ USER appuser
 EXPOSE 8080
 
 # Run the jar file
-CMD ["java", "-cp", "app.jar:/app/lib/mysql-connector.jar", "com.example.YourMainClass"]
+CMD ["java", "-cp", "app.jar:/app/lib/mysql-connector.jar", "com.studentapp.StudentApp"]
 
 
