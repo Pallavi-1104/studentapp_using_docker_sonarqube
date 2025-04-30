@@ -1,7 +1,14 @@
 # Build stage: compile the application
+# Build stage
 FROM maven:3.8.5-openjdk-11 AS build
 WORKDIR /app
 COPY . .
+
+# Unzip the mysql-connector.jar
+RUN apt-get update && apt-get install -y unzip && \
+    unzip mysql-connector.zip -d /app/lib
+
+# Build the app
 RUN mvn clean package -DskipTests
 
 # Final image: use Tomcat to run the WAR
@@ -20,3 +27,22 @@ COPY mysql-connector.jar /usr/local/tomcat/lib/
 EXPOSE 8080
 
 # Default Tomcat CMD already handles startup
+
+# Final image
+FROM openjdk:11-jre-slim
+WORKDIR /app
+
+# Copy the war and the MySQL connector jar
+COPY --from=build /app/target/student.war app.jar
+COPY --from=build /app/lib/mysql-connector.jar /app/lib/mysql-connector.jar
+
+# Create a non-root user and switch to it for security
+RUN useradd -ms /bin/bash appuser
+USER appuser
+
+EXPOSE 8080
+
+# Run the jar file
+CMD ["java", "-cp", "app.jar:/app/lib/mysql-connector.jar", "com.example.YourMainClass"]
+
+
