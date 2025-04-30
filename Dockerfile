@@ -4,9 +4,9 @@ FROM maven:3.8.5-openjdk-11 AS build
 WORKDIR /app
 COPY . .  # Ensure mysql-connector.zip is in the same directory as this Dockerfile
 
-# Unzip the mysql-connector.zip to /app/lib
+# Unzip the mysql-connector.jar to /app/lib
 RUN apt-get update && apt-get install -y unzip && \
-    unzip mysql-connector.zip -d /app/lib
+    unzip mysql-connector.jar -d /app/lib
 
 # Build the application
 RUN mvn clean package -DskipTests
@@ -34,7 +34,7 @@ WORKDIR /app
 
 # Copy the war file and MySQL connector jar
 COPY --from=build /app/target/student.war app.jar
-COPY --from=build /app/lib/mysql-connector.jar /app/lib/mysql-connector.jar
+COPY mysql-connector.jar /app/lib/mysql-connector.jar
 
 # Create a non-root user and switch to it for security
 RUN useradd -ms /bin/bash appuser
