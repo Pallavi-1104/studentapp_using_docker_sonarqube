@@ -8,11 +8,11 @@ RUN apt update && \
     rm -rf /var/lib/apt/lists/*
 
 # Download and extract Tomcat
-ADD https://dlcdn.apache.org/tomcat/tomcat-9/v9.0.97/bin/apache-tomcat-9.0.97.tar.gz /opt/apache-tomcat-9.0.97.tar.gz
+ADD https://dlcdn.apache.org/tomcat/tomcat-9/v9.0.104/bin/apache-tomcat-9.0.104.tar.gz /opt/apache-tomcat-9.0.104.tar.gz
 
 # Extract the Tomcat tarball
-RUN tar -xvzf /opt/apache-tomcat-9.0.97.tar.gz -C /opt && \
-    rm /opt/apache-tomcat-9.0.97.tar.gz  # Remove tarball to save space
+RUN tar -xvzf /opt/apache-tomcat-9.0.104.tar.gz -C /opt && \
+    rm /opt/apache-tomcat-9.0.104.tar.gz  # Remove tarball to save space
 
 # Stage 2: Final stage
 FROM openjdk:11-jre-slim
@@ -21,18 +21,18 @@ FROM openjdk:11-jre-slim
 WORKDIR /opt/
 
 # Copy Tomcat from the builder stage
-COPY --from=builder /opt/apache-tomcat-9.0.97 /opt/apache-tomcat-9.0.97
+COPY --from=builder /opt/apache-tomcat-9.0.104 /opt/apache-tomcat-9.0.104
 
 # Copy the WAR file, MySQL connector JAR, and context.xml to the appropriate directories
-#COPY student.war /opt/apache-tomcat-9.0.97/webapps/
-COPY mysql-connector.jar /opt/apache-tomcat-9.0.97/lib/
-#COPY context.xml /opt/apache-tomcat-9.0.97/conf/context.xml
+#COPY student.war /opt/apache-tomcat-9.0.104/webapps/
+COPY mysql-connector.jar /opt/apache-tomcat-9.0.104/lib/
+#COPY context.xml /opt/apache-tomcat-9.0.104/conf/context.xml
 
 # Set permissions for Tomcat scripts
-RUN chmod +x /opt/apache-tomcat-9.0.97/bin/*.sh
+RUN chmod +x /opt/apache-tomcat-9.0.104/bin/*.sh
 
 # Expose port 8080
 EXPOSE 8080
 
 # Run Tomcat
-CMD ["/opt/apache-tomcat-9.0.97/bin/catalina.sh", "run"]
+CMD ["/opt/apache-tomcat-9.0.104/bin/catalina.sh", "run"]
